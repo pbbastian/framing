@@ -1,38 +1,55 @@
 \section{Encoder (Peter)}
 Each block has a table listing the input and output signals. Input signals are denoted with a left arrow ($\leftarrow$) and output signals with a right arrow ($\rightarrow$). All the blocks are going to be implemented in VHDL.
-\begin{table}[!h]
+\begin{table}[H]
 \centering%
 \caption{Encoder signals}\label{tab:table}
-\begin{tabular}{l|l}
-  \textbf{Signal} & \textbf{Description}\\\hline\hline
-   audio & Audio data\\\hline
-   audio\_clk & Clock for \emph{audio}\\\hline
-   video & Video data\\\hline
-   video\_clk & Clock for \emph{video}\\\hline
-   i & Output 1\\\hline
-   q & Output 2\\\hline
-   clk & System clock\\
-\end{tabular}
+\begin{tabular*}{\textwidth}{ll@{\hspace{1cm}}l}
+   & \textbf{Signal} & \textbf{Description}\\\hline\hline
+   $\leftarrow$ & audio & Audio data\\\hline
+   $\leftarrow$ & audio\_clk & Clock for \emph{audio}\\\hline
+   $\leftarrow$ & video & Video data\\\hline
+   $\leftarrow$ & video\_clk & Clock for \emph{video}\\\hline
+   $\rightarrow$ & i & Output 1\\\hline
+   $\rightarrow$ & q & Output 2\\\hline
+   $\leftarrow$ & clk & System clock\\
+\end{tabular*}
 \end{table}
-The encoder takes in signals for audio and video data and a clock for each. There’s also a system clock which will be used for most of the inner components.
-
-\subsection{Internal components}
 The encoder is made up of several internal components. We’ve separated it into parts where we think it makes sense. There’s no reason to mix up unrelated logic.
 
-\subsubsection{Async FIFO}
+\subsection{Async FIFO}
+\begin{table}[!h]
+\centering%
+\caption{Async FIFO signals}\label{tab:table}
+\begin{tabular*}{\textwidth}{ll@{\hspace{1cm}}l}
+  & \textbf{Signal} & \textbf{Description}\\\hline\hline
+  $\leftarrow$ & data\_in & Ingoing data\\\hline
+  $\leftarrow$ & clk\_in & Clock for \textit{data\_in}\\\hline
+  $\leftarrow$ & data\_out & Outgoing data\\\hline
+  $\rightarrow$ & clk\_out & Clock for \textit{data\_out}\\
+\end{tabular*}
+\end{table}
 The async FIFOs are the first block in the encoder and thus the blocks to receive the very first input signals.
 
 There are two async FIFO blocks; one for input from audio and one for input from video. FIFO stands for “First In, First Out” and its objective is to accept input and output in the same order.
 
 We will be using asynchronous FIFOs, meaning that it takes a clock for input and a clock for output. This enables us to easily use the asynchronous FIFOs for input synchronisation purposes. This is needed because we will be receiving audio and video data at different clocks.
 
-\subsubsection{ID generator}
+\subsection{ID generator}
+\begin{table}[!h]
+\centering%
+\caption{ID generator signals}\label{tab:table}
+\begin{tabular*}{\textwidth}{ll@{\hspace{1cm}}l}
+  & \textbf{Signal} & \textbf{Description}\\\hline\hline
+  $\leftarrow$ & clk & Clock that increments \textit{value} everytime it hits\\\hline
+  $\rightarrow$ & value & Current value\\
+\end{tabular*}
+\end{table}
 Every frame needs an ID in the form of a number, the capacity of which has to be chosen with care. When a frame is sent with an ID, it should be received and processed before another frame is sent with the same ID.
 
 It’s hard to definitively select a capacity for the ID, but we can calculate the allowed delay. If every frame has a size of f bits, n bits is used for ID and we transmit at t bit/s the maximum delay D is given by:
 
 \begin{equation}
-  D = \frac{2^n}{\frac{t}{f}} = \frac{f \cdot 2^n)}{t}
+  D = \frac{2^n}{\frac{t}{f}} = \frac{f \cdot 2^n}{t}
 \end{equation}
 
 We are using a frame size of 4096 bits and aim at a transmission speed of 1.5 Mbit/s. If we use 16 bits for storing the ID we get:
@@ -45,7 +62,25 @@ Even for long range communication, this should be enough by far. Seeing as we ha
 
 The ID generator expects an input clock through the clock signal. At all times it keeps the current value in the value signals. The value starts at $0_{10}$ and is incremented by $1_{10}$ every time the clock strikes.
 
-\subsubsection{Framer}
+\subsection{Framer}
+\begin{table}[!h]
+\centering%
+\caption{Framer signals}\label{tab:table}
+\begin{tabular*}{\textwidth}{ll@{\hspace{1cm}}l}
+  & \textbf{Signal} & \textbf{Description}\\\hline\hline
+  $\leftarrow$ & clk & System clock\\\hline
+  $\leftarrow$ & audio\_data & Audio data\\\hline
+  $\leftarrow$ & audio\_count & Number of audio bits currently available\\\hline
+  $\leftarrow$ & video\_data & Video data\\\hline
+  $\leftarrow$ & video\_count & Number of video bits currently available\\\hline
+  $\leftarrow$ & parity\_data & Parity data\\\hline
+  $\rightarrow$ & audio\_clk & Clock for \textit{audio\_data}\\\hline
+  $\rightarrow$ & video\_clk & Clock for \textit{video\_data}\\\hline
+  $\rightarrow$ & parity\_clk & Clock for \textit{parity\_data}\\\hline
+  $\rightarrow$ & id\_clk & Clock for the ID generator\\\hline
+  $\rightarrow$ & out\_data & Output of constructed frame data\\
+\end{tabular*}
+\end{table}
 The framer component is responsible for the actual construction of the frame and thus it is right in the middle of everything. It runs on the system clock, which it delegates around to the other components as needed.
 
 1 bit of the frame will be filled per clock cycle. Every time a bit is completed it will be send to the splitter. Every time an information or header bit is completed it will be sent to the parity generator with a clock strike so that it can begin generating the parity bits.
@@ -62,7 +97,17 @@ After this the audio pointer will be output followed by the video pointer. This 
 
 Any leftover space in the frame must be filled by pseudo-random data.
 
-\subsubsection{Parity calculator}
+\subsection{Parity calculator}
+\begin{table}[!h]
+\centering%
+\caption{Parity calculator signals}\label{tab:table}
+\begin{tabular*}{\textwidth}{ll@{\hspace{1cm}}l}
+  & \textbf{Signal} & \textbf{Description}\\\hline\hline
+  $\leftarrow$ & clk & System and input clock\\\hline
+  $\leftarrow$ & in\_data & Ingoing data\\\hline
+  $\rightarrow$ & out\_data & Outgoing data\\
+\end{tabular*}
+\end{table}
 The objective of the parity generator is to calculate the parity bits of the frame. Using cyclic hamming codes represented as polynomials, this can be done in a sort of streaming way.
 
 The parity calculator needs to contain several identical sub components for calculating groups of parity bits, as one group of parity bits for the columns can’t be completely calculated before the next group. That is however possible for the rows.
@@ -73,5 +118,14 @@ The actual calculation will be done by finding the remainder of a polynomial div
 
 The output should be selected from the right subcomponent, which is possible by counting the clocks.
 
-\subsubsection{Splitter}
+\subsection{Splitter}
+\begin{table}[!h]
+\centering%
+\caption{Splitter signals}\label{tab:table}
+\begin{tabular*}{\textwidth}{ll@{\hspace{1cm}}l}
+  & \textbf{Signal} & \textbf{Description}\\\hline\hline
+  $\leftarrow$ & in\_data & Ingoing data\\\hline
+  $\rightarrow$ & out\_data & Outgoing data\\
+\end{tabular*}
+\end{table}
 The I and Q stream is constructed from the output of the Frame block. The I stream is made from all the odd positions of the stream and the Q stream is made from all the even positions. These signals will be sent along with a clock out of the system. It is not clear yet how this is to be done.
