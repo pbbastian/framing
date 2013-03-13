@@ -1,0 +1,15 @@
+\section{Decoder (Kim + William)}
+
+\subsection{Synchronisation}
+At the decoding end of the system, we will receive a pair of I and Q signals from the modulation group. Here, the system will look for the ASM and use this to separate the frames from each other and identify the IQ signals as either inverted or correct. If they're inverted, they will have to be rectified before being sent to the next box.
+
+In case the ASM is missing (isn't where it is expected to be), a search for another ASM starts.  When an ASM at an alternative position has been found, this position will be used to find the next ASM\. Here, the system will simply look a frame-size ahead. In case two ASMs are found with a correct distance between them (matching a the size of a frame), the system will be set to a "stable" state and further ASMs are expected to found periodically.
+
+\subsection{Error correction}
+Since we are using Hamming(64,57,4), one error can be corrected and two error can be detected in each row and column. In the error correction process, these errors will first be fixed by row and then by column.
+
+\subsection{Deframing}
+During the deframing process, the audio and video data is located in each frame based on the pointers and the corresponding bit data is sent on to the audio and video group.
+
+\subsection{Audio \& video}
+The audio and video stream is sent along with a clock and a receipt which tells the receiver whether or not it is real data, or just dummy data, that has been sent. The dummy data is used when there isn't any real data present, but something is still needed to be sent at the clock cycle.

@@ -1,0 +1,8 @@
+\section{Frame (Peter)}
+Our frame consists of three parts: Header, information and parity. The total frame can be described as a grid of 64*64 bits. The header and information shares a grid of 57*57 bits.
+
+The header contains an ID using 16 bits, a pointer to the end of the audio data using 12 bits and a pointer to the end of the video data using 12 bits. As such the header is 40 bits in total.
+
+The information contains audio data followed by video data. There is no hard limit for the amount of audio or video data separately. The amount of audio and video data combined does however have a hard limit of 3209 bits. We assume that the bitrate is high enough to allow for the frame to never be completely filled.
+
+The 57*57 grid is surrounded by parity data. There is 7 bits of parity data for every line and row.

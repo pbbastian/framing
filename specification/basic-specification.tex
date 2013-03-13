@@ -1,0 +1,6 @@
+\section{Basic specification (Peter)}
+The main objectives of the product is to handle framing and error-correction for a transmission of audio and video signals. The product consists of components: An encoder and a decoder.
+
+The encoder should receive audio and video input signals, fill a frame with an ID, input and corresponding parity bits and finally output the frame on the I and Q signals using a clock.
+
+The decoder should receive I and Q input signals, do frame synchronisation, handle inverted signals, perform error correction and counting, deframe the input and output separate video and audio signals with a clock.

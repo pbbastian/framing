@@ -1,0 +1,15 @@
+\subsection{Theory (William)}
+
+\subsubsection{Framing and error correction}
+With a main objective of delivering frame-based error correction, one goal is to correctly identify where the frames start and end. To do this, we will separate each frame with a synchronization word (ASM) when constructing the data stream and look for the same word when separating the frames. Inspired by the text “Frame Synchronization” we will use the ASM “1ACFFC1D”, as this word will be harder to confuse with other, random bits.
+
+Due to channel noise, we can’t assume that the ASMs and frames will be sent without errors and the ASM may be found at alternative positions. We will therefore look for two ASMs with correct distance between each other to contain a frame before defining the content between the two as a frame.
+
+To keep up with a high-capacity network, we will use forward-error-correction with the (64,57,4) extended Hamming code to identify and correct errors in the information bits. This works by using product code. Here, we will fill a 64 times 64 bits frame with 57 times 57 information bits and then add seven parity bits to each row and column and an additional seven times seven parity bits of parity bits in the end. This procedure will enable us to correct single errors and detect double errors.
+
+The last thing we need to keep in mind is how we separate the data from the audio and the video group. To do this, we will include some additional information in the beginning of each frame. This information will describe the contents of the frame and include a frame number, which has to contain enough bits to handle the large delay (e.g 16 bits), and two pointers telling where the data from the audio group and the video groups ends. This way, we can separate the data from each group when deframing it and sending it to the right group.
+
+\subsubsection{Synchronisation}
+We will be using a FiFo when receiving and passing on data to audio and video groups, while passing and receiving data from the modulation groups will be handled by IQ signals. This means that we must carefully choose (or negotiate) a clock frequency higher than the ones used by the audio and video group. Otherwise, the other groups will overwrite their own data in the FiFo before it has been chaptered by us.
+
+Since the modulation group doesn’t have the bigger picture of the data stream, they may confuse the IQ signals and send an inverted I or Q signal instead of the right one Therefore, we must evaluate the data received from this group and re-invert any inverted signals.
