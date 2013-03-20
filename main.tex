@@ -1,6 +1,7 @@
 \documentclass[11pt,a4paper,UKenglish]{memoir}
 % Template by DTU LaTeX support group, v20090423
 
+\usepackage{fullpage}
 \usepackage[utf8]{inputenc} % Must correspond to the input encoding used by the editor
 \usepackage{babel} % Other languages, in this case UKenglish
 \usepackage[T1]{fontenc} % font encoding (output), use T1 for most latin languages
@@ -9,51 +10,57 @@
 \graphicspath{{./figures/}} % path to figures and images
 \usepackage{float}
 \usepackage{mathtools} % mathmatics
-
-\usepackage{xcolor}
+\usepackage[usenames,dvipsnames]{xcolor}
 \usepackage[plainpages=false,pdfpagelabels,pageanchor=false]{hyperref} % active links
+\usepackage{memhfixc}% fixes for hyperref
+\usepackage{tikz}
+\usepackage{array}
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
 \hypersetup{%
-  pdfauthor={<your name>},
-  pdftitle={<title>},
-  pdfsubject={<subject>},
+  pdfauthor={},
+  pdftitle={Framing},
+  pdfsubject={},
   citebordercolor={0 1 0}, % The color of the box around citations (change to 1 1 1 to remove)
-  linkbordercolor={1 0 0}, % The color of the box around normal links
+  linkbordercolor=YellowOrange!50, % The color of the box around normal links
   pagebordercolor={1 1 0}, % The color of the box around links to pages
   urlbordercolor= {1 1 1}  % The color of the box around links to URLs
 }
-\usepackage{memhfixc}% fixes for hyperref
 
 % The following can be used if not using custom frontpage
-\title{Framing}
-\author{name\\
-        \\
-        <student id>
-}
-\date{\today}
+% \title{Framing}
+% \author{Kim Bo Rasmussen, s070808\\
+% William Buch Grønholm, s113117\\
+% Peter Bay Bastian, s113119\\
+% }
+% \date{\today}
 
 % \includeonly{preface,testing} % Only compile those files you are working in (to save compile time, and power)
 
 \begin{document}
-\frontmatter % roman page numbering
-%\maketitle  % use this if not using custom frontpage
-\include{frontpage}
-\include{abstract}
-\tableofcontents
-\listoffigures
-\listoftables
-
-\mainmatter % arabic page numbering
-\include{preface}
-\include{specification}
-\include{system-description}
-\include{conclusion}
-\include{testing}
-
-\include{biblio/bib}
-
-\appendix % Alphabetic chapter numbering
-\renewcommand{\appendixtocname}{Appendix} % Change appendix name for the table od contents
-\addappheadtotoc % 'Appendix' to the table of contents
-\include{appendix-code}
-\backmatter % for glossary, index, back page
+  \frontmatter % roman page numbering
+  % \maketitle  % use this if not using custom frontpage
+  \include{frontpage}
+  \include{abstract}
+  \tableofcontents
+  \listoffigures
+  \listoftables
+  
+  \mainmatter % arabic page numbering
+  \include{preface}
+  \include{specification}
+  \include{system-description}
+  \include{conclusion}
+  % \include{testing}
+  
+  \include{biblio/bib}
+  
+  \appendix % Alphabetic chapter numbering
+  \renewcommand{\appendixtocname}{Appendix} % Change appendix name for the table od contents
+  \addappheadtotoc % 'Appendix' to the table of contents
+  \include{appendix-code}
+  \backmatter % for glossary, index, back page
 \end{document}

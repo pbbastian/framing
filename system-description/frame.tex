@@ -1,8 +1,23 @@
 \section{Frame (Peter)}
 Our frame consists of three parts: Header, information and parity. The total frame can be described as a grid of 64*64 bits. The header and information shares a grid of 57*57 bits.
 
-The header contains an ID using 16 bits, a pointer to the end of the audio data using 12 bits and a pointer to the end of the video data using 12 bits. As such the header is 40 bits in total.
+The header contains an ASM using 32 bits, an ID using 16 bits, a pointer to the end of the audio data using 12 bits and a pointer to the end of the video data using 12 bits. As such the header is 72 bits in total.
 
-The information contains audio data followed by video data. There is no hard limit for the amount of audio or video data separately. The amount of audio and video data combined does however have a hard limit of 3209 bits. We assume that the bitrate is high enough to allow for the frame to never be completely filled.
+The information contains audio data followed by video data. The information may at most be 3179 bits. We assume that the bitrate is high enough to allow for the frame to never be completely filled.
+
+Any space leftover will be filled with pseudo-random data, since the modulation group will have a hard time keeping synchronisation if we transmit sheer zeros. It is not yet certain how this will be generated.
 
 The 57*57 grid is surrounded by parity data. There is 7 bits of parity data for every line and row.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[scale=0.2]
+    \draw (0,0) rectangle (64,64);
+    \draw (57,0) -- ++(0,64);
+    \draw (0,64-57) -- ++(64,0);
+    \draw (0,64-2) -- ++(72-57,0) -- ++(0,1) -- ++(57-72+57,0);
+    \draw (57-32,64-57) -- ++(0,1) -- ++(32,0);
+  \end{tikzpicture}
+  \caption{Frame structure}
+  \label{fig:frame-structure}
+\end{figure}

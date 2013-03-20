@@ -1,18 +1,18 @@
-\section{Functions (Kim)}
+\subsection{Functions (Kim)}
 
-\subsection{Frame}
-The frame is constructed from 7 parts. The synchronization word (ASM), an IDnumber of the current frame, 2 pointers, one to the end of the audio stream and one to the end of the video stream, the audio stream and the video stream and in the end some dummy data to fill the rest of the information part. 
+\subsubsection*{Frame}
+The frame is constructed from 7 parts. The synchronization word (ASM), an ID number of the current frame, 2 pointers, one to the end of the audio stream and one to the end of the video stream, the audio stream and the video stream and in the end some dummy data to fill the rest of the information part. 
 
-This information is comprised of 57 by 57 bits, with parity bits on the ends of both the rows and the columns of information. So the frame with information and parity bits will be 64 by 64 bits. This is because we will use Hamming(64, 57, 4) to handle error correction.
+This information is comprised of 57 by 57 bits, with parity bits on the ends of both the rows and the columns of information. So the frame with information and parity bits will be 64 by 64 bits. This is because Hamming(64, 57, 4) is used to handle error correction.
 
-\subsection{Encoder}
+\subsubsection*{Encoder}
 The encoder receives two signals. An audio signal and a video signal. These signals will be taken and filled into a frame, placed after a header with info about the ASM, Id-number of the frame, pointers to the end of the audio signal and the end of the video signal.
 
 During the assembly of the frame, parity bits is calculated for the rows of the frame. These will be constructed from a (64, 57, 4) Hamming code. There will also be calculated parity bits for the columns, but these will be made from the stored info and then calculated on the fly.
 
 After the frame has been constructed, it will be disassembled into I and Q signals. The I signal will take care of the odd positions of the frame, and the Q signal will take care of the even positions of the signal.
 
-\subsection{Decoder}
+\subsubsection*{Decoder}
 The decoder receives an I and Q signal along with a clock. The first thing which happens is the search for a sync word. During this search attention will be put on figuring out whether the signal have been inverted in either the I channel or Q channel. If it’s the case, the signals will be inverted back to the original state and then sent to the error correction, and the search for another sync word will commence. 
 
 The error correction will be performed first on the rows then on columns. After error correction the frame will be deconstructed into an audio stream and a video stream which will be sent out of the system along with a clock and a receipt signal. The receipt signal is used to describe whether the audio or video is actual data or dummy data.
